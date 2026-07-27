@@ -21,6 +21,9 @@
    3. gap = Abstand zum Sieger als Text (beim Sieger die Gesamtzeit).
    4. dnf: true → zählt keine Punkte, landet unten in der Wertung.
    5. fastestLap = Fahrer-ID der schnellsten Runde.
+   6. penalties = zweite Tabelle der Spiel-CSV, ohne die reinen Warnungen.
+      Pro Eintrag t (Zeit), lap, driver, what (Vorfall), pen (Strafe).
+      Weglassen ist erlaubt — dann fehlt der Block einfach.
 
    Punkte: 25-18-15-12-10-8-6-4-2-1.
    FASTEST_LAP_POINT auf true stellen, falls ihr den Extrapunkt fahrt.
@@ -85,6 +88,21 @@ const RACES = [
   {
     round: 1, gp: "Katalonien", circuit: "Circuit de Barcelona-Catalunya", date: "2026-05-04", laps: 25,
     fastestLap: "emefka",
+    penalties: [
+      { t: "4:00.761",  lap: 3,  driver: "l1chtfloh",   what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "4:10.639",  lap: 4,  driver: "emefka",      what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "9:40.690",  lap: 8,  driver: "l1chtfloh",   what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "13:37.653", lap: 10, driver: "mauramir",    what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "18:03.170", lap: 14, driver: "l1chtfloh",   what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "18:35.652", lap: 14, driver: "l1chtfloh",   what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
+      { t: "19:33.230", lap: 15, driver: "emefka",      what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "24:39.856", lap: 18, driver: "mauramir",    what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "28:08.018", lap: 21, driver: "l1chtfloh",   what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "28:33.054", lap: 23, driver: "emefka",      what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "29:25.477", lap: 22, driver: "mauramir",    what: "Mehrere Warnungen",      pen: "3 Sek." },
+      { t: "31:06.839", lap: 24, driver: "huelkenberg", what: "Mechanisches Versagen",  pen: "DNF" },
+      { t: "32:37.975", lap: 24, driver: "l1chtfloh",   what: "Nicht erfüllte Strafe",  pen: "10 Sek." },
+    ],
     results: [
       { driver: "emefka",      gap: "32:34.071" },
       { driver: "russell",     gap: "+22.268" },
@@ -111,6 +129,10 @@ const RACES = [
   {
     round: 2, gp: "Spa-Francorchamps", circuit: "Circuit de Spa-Francorchamps", date: "2026-07-13", laps: 22,
     fastestLap: "emefka",
+    penalties: [
+      { t: "0:26.866",  lap: 1,  driver: "emefka",     what: "Kollision mit Leclerc, eine Position gutgemacht", pen: "10 Sek. Zeitstrafe" },
+      { t: "26:16.497", lap: 14, driver: "verstappen", what: "Mechanisches Versagen", pen: "DNF" },
+    ],
     results: [
       { driver: "l1chtfloh",   gap: "42:28.550" },
       { driver: "norris",      gap: "+0.647" },
@@ -139,6 +161,14 @@ const RACES = [
   {
     round: 3, gp: "Ungarn", circuit: "Hungaroring", date: "2026-07-27", laps: 18,
     fastestLap: "emefka",
+    penalties: [
+      { t: "0:38.849",  lap: 1,  driver: "piastri",   what: "Gelbe Flagge ignoriert",   pen: "10 Sek. Zeitstrafe" },
+      { t: "0:49.053",  lap: 1,  driver: "emefka",    what: "Rasen während VSC-Phase",  pen: "Durchfahrtsstrafe" },
+      { t: "1:48.781",  lap: 1,  driver: "emefka",    what: "Rasen in der Boxengasse",  pen: "10 Sek. Zeitstrafe" },
+      { t: "16:12.173", lap: 11, driver: "l1chtfloh", what: "Rasen in der Boxengasse",  pen: "10 Sek. Zeitstrafe" },
+      { t: "19:19.344", lap: 14, driver: "bearman",   what: "Mechanisches Versagen",    pen: "DNF" },
+      { t: "26:21.657", lap: 18, driver: "l1chtfloh", what: "Nicht erfüllte Strafe",    pen: "10 Sek." },
+    ],
     results: [
       { driver: "verstappen",  gap: "25:31.257" },
       { driver: "russell",     gap: "+1.725" },
@@ -203,6 +233,13 @@ body{
 .eyebrow{
   font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
   font-weight:700;margin:0 0 10px
+}
+.brand{display:flex;align-items:center;gap:26px}
+.brandtext{min-width:0}
+.mark{width:104px;height:auto;flex:0 0 auto}
+.markletters{
+  font-family:var(--sans);font-style:italic;font-weight:900;font-size:36px;
+  fill:var(--white);letter-spacing:.005em
 }
 h1{
   margin:0;font-weight:900;font-style:italic;letter-spacing:-.02em;
@@ -295,18 +332,56 @@ tbody th.human{background:var(--darkred);color:#fff}
 
 footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);font-size:11px;color:#55555e;line-height:1.7}
 
+/* ── Strafen & Vorfälle ────────────────────────────── */
+.pentitle{
+  margin:36px 0 14px;font-size:12px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted)
+}
+table.pens{font-size:12px}
+table.pens td{padding:8px 11px}
+table.pens .pt,table.pens .pl{color:#5f5f6a;text-align:right;white-space:nowrap;width:1%}
+table.pens .pd{
+  text-align:left;font-family:var(--sans);font-weight:700;font-size:13px;
+  white-space:nowrap;width:1%
+}
+table.pens .pd.human{color:var(--human)}
+table.pens .pw{text-align:left;font-family:var(--sans);color:var(--muted)}
+table.pens .pp{text-align:right;font-weight:700;color:#ff5a4d;white-space:nowrap}
+table.pens .pp.out{color:#5f5f6a}
+
 @media (max-width:620px){
   .row{grid-template-columns:38px 4px 1fr auto;gap:10px;padding-right:12px}
   .gap{display:none}
   .meta{gap:18px}
+  .brand{gap:16px}
+  .mark{width:66px}
+  .markletters{font-size:38px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
 <div class="wrap">
   <header class="masthead">
-    <p class="eyebrow">F1 26 · MRL</p>
-    <h1 id="title">Liga<span class="season">Saison</span></h1>
+    <div class="brand">
+      <!-- Startnummernschild: drei Speed-Balken für die drei echten Fahrer,
+           rote Kante wie der Strich unter dem Kopf. Keine fremden Marken. -->
+      <svg class="mark" viewBox="0 0 120 106" role="img" aria-labelledby="marktitle">
+        <title id="marktitle">MRL — Monday Racing League</title>
+        <g transform="translate(20 0) skewX(-11)">
+          <rect x="0" y="6" width="96" height="94" fill="#101014"
+                stroke="#33333f" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+          <rect x="11" y="19" width="60" height="6" fill="var(--human)"/>
+          <rect x="11" y="30" width="44" height="6" fill="var(--human)" opacity=".66"/>
+          <rect x="11" y="41" width="28" height="6" fill="var(--human)" opacity=".38"/>
+          <rect x="0" y="88" width="96" height="12" fill="var(--red)"/>
+        </g>
+        <text class="markletters" x="53" y="80" text-anchor="middle">MRL</text>
+      </svg>
+      <div class="brandtext">
+        <p class="eyebrow">F1 26 · MRL</p>
+        <h1 id="title">Liga<span class="season">Saison</span></h1>
+      </div>
+    </div>
     <div class="meta">
       <div><b id="m-rounds">0</b>Rennen gefahren</div>
       <div><b id="m-leader">–</b>Führung</div>
@@ -460,12 +535,28 @@ function renderRace(idx){
   const date = new Date(r.date + "T12:00:00")
     .toLocaleDateString("de-DE", { day:"2-digit", month:"long", year:"numeric" });
 
+  const pens = (r.penalties || []).map(p => {
+    const d = D[p.driver] || { name: p.driver };
+    return `<tr>
+      <td class="pt">${p.t}</td>
+      <td class="pl">R${p.lap}</td>
+      <td class="pd ${d.human ? "human" : ""}">${d.name}</td>
+      <td class="pw">${p.what}</td>
+      <td class="pp ${/DNF/.test(p.pen) ? "out" : ""}">${p.pen}</td>
+    </tr>`;
+  }).join("");
+
   $("#race").innerHTML = `
     <div class="racehead">
       <h3>${r.gp}</h3>
       <span>${r.circuit} · ${r.laps} Runden · ${date}</span>
     </div>
-    <div class="tower">${rows}</div>`;
+    <div class="tower">${rows}</div>
+    ${pens ? `<h3 class="pentitle">Strafen &amp; Vorfälle</h3>
+      <div class="scroller"><table class="pens">
+        <thead><tr><th>Zeit</th><th>Runde</th><th>Fahrer</th><th>Vorfall</th><th>Strafe</th></tr></thead>
+        <tbody>${pens}</tbody>
+      </table></div>` : ""}`;
 }
 
 function renderRounds(){
