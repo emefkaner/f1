@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Liga — F1 25 Multiplayer</title>
+<title>F1 26 MRL — Monday Racing League</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,300;0,400;0,600;0,700;0,900;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -26,79 +26,138 @@
    FASTEST_LAP_POINT auf true stellen, falls ihr den Extrapunkt fahrt.
 */
 
-const LEAGUE_NAME    = "Feierabend-Liga";
+const LEAGUE_NAME    = "Monday Racing League";
 const SEASON         = "Saison 1";
 const FASTEST_LAP_POINT = false;   // true = +1 Punkt für schnellste Runde (nur Top 10)
 
-// Platzhalter – durch eure echten Namen/Teams ersetzen
+/* Vollständiges Feld, Menschen und KI gemischt — eine echte Meisterschaft.
+   Quelle: die CSVs aus OneDrive\Dokumente\My Games\F1 25\session results
+
+   team ist jeweils das AKTUELLE Team (Stand 2026er Kader). Wer die Saison
+   über gewechselt hat, steht hier trotzdem nur einmal:
+     Hadjar    Racing Bulls → Red Bull
+     Hülkenberg  Kick Sauber → Audi
+     L1chtfloh   Aston Martin → Cadillac → Audi
+   Hamilton und Bortoleto sind nur in Runde 1 gefahren, danach war der
+   2026er Kader aktiv (Bottas, Pérez und Lindblad kamen dafür dazu).      */
+
 const DRIVERS = [
-  { id: "emefka", name: "Emefka", tag: "EMF", team: "Red Bull",     color: "#3671C6" },
-  { id: "nico",   name: "Nico",   tag: "NIC", team: "Ferrari",      color: "#E8002D" },
-  { id: "timo",   name: "Timo",   tag: "TIM", team: "McLaren",      color: "#FF8000" },
-  { id: "lars",   name: "Lars",   tag: "LAR", team: "Mercedes",     color: "#27F4D2" },
-  { id: "jana",   name: "Jana",   tag: "JAN", team: "Aston Martin", color: "#229971" },
-  { id: "basti",  name: "Basti",  tag: "BAS", team: "Williams",     color: "#64C4FF" },
+  { id: "emefka",      name: "emefka",     tag: "EMF", team: "Audi",         color: "#00B3A4" },
+  { id: "l1chtfloh",   name: "L1chtfloh",  tag: "L1C", team: "Audi",         color: "#00B3A4" },
+  { id: "mauramir",    name: "mauramir",   tag: "MAU", team: "Ferrari",      color: "#E8002D" },
+
+  { id: "verstappen",  name: "Verstappen", tag: "VER", team: "Red Bull",     color: "#3671C6" },
+  { id: "hadjar",      name: "Hadjar",     tag: "HAD", team: "Red Bull",     color: "#3671C6" },
+  { id: "russell",     name: "Russell",    tag: "RUS", team: "Mercedes",     color: "#27F4D2" },
+  { id: "antonelli",   name: "Antonelli",  tag: "ANT", team: "Mercedes",     color: "#27F4D2" },
+  { id: "leclerc",     name: "Leclerc",    tag: "LEC", team: "Ferrari",      color: "#E8002D" },
+  { id: "hamilton",    name: "Hamilton",   tag: "HAM", team: "Ferrari",      color: "#E8002D" },
+  { id: "norris",      name: "Norris",     tag: "NOR", team: "McLaren",      color: "#FF8000" },
+  { id: "piastri",     name: "Piastri",    tag: "PIA", team: "McLaren",      color: "#FF8000" },
+  { id: "alonso",      name: "Alonso",     tag: "ALO", team: "Aston Martin", color: "#229971" },
+  { id: "stroll",      name: "Stroll",     tag: "STR", team: "Aston Martin", color: "#229971" },
+  { id: "sainz",       name: "Sainz",      tag: "SAI", team: "Williams",     color: "#64C4FF" },
+  { id: "albon",       name: "Albon",      tag: "ALB", team: "Williams",     color: "#64C4FF" },
+  { id: "gasly",       name: "Gasly",      tag: "GAS", team: "Alpine",       color: "#FF87BC" },
+  { id: "colapinto",   name: "Colapinto",  tag: "COL", team: "Alpine",       color: "#FF87BC" },
+  { id: "ocon",        name: "Ocon",       tag: "OCO", team: "Haas",         color: "#B6BABD" },
+  { id: "bearman",     name: "Bearman",    tag: "BEA", team: "Haas",         color: "#B6BABD" },
+  { id: "huelkenberg", name: "Hülkenberg", tag: "HUL", team: "Audi",         color: "#00B3A4" },
+  { id: "bottas",      name: "Bottas",     tag: "BOT", team: "Cadillac",     color: "#C9A227" },
+  { id: "perez",       name: "Pérez",      tag: "PER", team: "Cadillac",     color: "#C9A227" },
+  { id: "lawson",      name: "Lawson",     tag: "LAW", team: "Racing Bulls", color: "#6692FF" },
+  { id: "lindblad",    name: "Lindblad",   tag: "LIN", team: "Racing Bulls", color: "#6692FF" },
+  { id: "bortoleto",   name: "Bortoleto",  tag: "BOR", team: "Kick Sauber",  color: "#52E252" },
 ];
+
+/* Ergebnisse 1:1 aus den Spiel-CSVs, volle Zielreihenfolge inklusive KI.
+   Die Punkte, die die Seite daraus rechnet, decken sich mit der Pkt.-Spalte
+   des Spiels.
+
+   laps ist geschätzt — die CSV hat keine Rundenspalte, die Zahl ist aus
+   Gesamtzeit und schnellster Runde hochgerechnet. Bei Bedarf überschreiben. */
 
 const RACES = [
   {
-    round: 1, gp: "Bahrain", circuit: "Sakhir", date: "2026-06-14", laps: 17,
-    fastestLap: "nico",
-    results: [
-      { driver: "emefka", gap: "32:04.581" },
-      { driver: "nico",   gap: "+3.412" },
-      { driver: "timo",   gap: "+8.907" },
-      { driver: "basti",  gap: "+14.220" },
-      { driver: "jana",   gap: "+21.883" },
-      { driver: "lars",   dnf: true, gap: "Unfall" },
-    ]
-  },
-  {
-    round: 2, gp: "Imola", circuit: "Autodromo Enzo e Dino Ferrari", date: "2026-06-21", laps: 16,
+    round: 1, gp: "Katalonien", circuit: "Circuit de Barcelona-Catalunya", date: "2026-05-04", laps: 25,
     fastestLap: "emefka",
     results: [
-      { driver: "timo",   gap: "29:47.118" },
-      { driver: "emefka", gap: "+1.044" },
-      { driver: "lars",   gap: "+6.510" },
-      { driver: "nico",   gap: "+9.771" },
-      { driver: "basti",  gap: "+18.302" },
-      { driver: "jana",   gap: "+24.665" },
+      { driver: "emefka",      gap: "32:34.071" },
+      { driver: "russell",     gap: "+22.268" },
+      { driver: "hamilton",    gap: "+23.479" },
+      { driver: "bortoleto",   gap: "+25.412" },
+      { driver: "norris",      gap: "+28.875" },
+      { driver: "colapinto",   gap: "+29.318" },
+      { driver: "sainz",       gap: "+31.123" },
+      { driver: "piastri",     gap: "+33.549" },
+      { driver: "alonso",      gap: "+36.277" },
+      { driver: "lawson",      gap: "+40.220" },
+      { driver: "verstappen",  gap: "+40.739" },
+      { driver: "antonelli",   gap: "+40.751" },
+      { driver: "ocon",        gap: "+51.701" },
+      { driver: "albon",       gap: "+52.006" },
+      { driver: "bearman",     gap: "+57.338" },
+      { driver: "gasly",       gap: "+1:08.702" },
+      { driver: "hadjar",      gap: "+1 Runde" },
+      { driver: "l1chtfloh",   gap: "+1 Runde" },
+      { driver: "mauramir",    gap: "+1 Runde" },
+      { driver: "huelkenberg", gap: "+2 Runden" },
     ]
   },
   {
-    round: 3, gp: "Monaco", circuit: "Circuit de Monaco", date: "2026-06-28", laps: 26,
-    fastestLap: "lars",
+    round: 2, gp: "Spa-Francorchamps", circuit: "Circuit de Spa-Francorchamps", date: "2026-07-13", laps: 22,
+    fastestLap: "emefka",
     results: [
-      { driver: "nico",   gap: "38:12.900" },
-      { driver: "lars",   gap: "+2.187" },
-      { driver: "emefka", gap: "+4.339" },
-      { driver: "jana",   gap: "+11.052" },
-      { driver: "timo",   dnf: true, gap: "Mauer, Runde 9" },
-      { driver: "basti",  dnf: true, gap: "Getriebe" },
+      { driver: "l1chtfloh",   gap: "42:28.550" },
+      { driver: "norris",      gap: "+0.647" },
+      { driver: "alonso",      gap: "+3.947" },
+      { driver: "emefka",      gap: "+7.013" },
+      { driver: "russell",     gap: "+7.586" },
+      { driver: "albon",       gap: "+11.479" },
+      { driver: "ocon",        gap: "+12.043" },
+      { driver: "bottas",      gap: "+15.887" },
+      { driver: "gasly",       gap: "+18.852" },
+      { driver: "antonelli",   gap: "+19.298" },
+      { driver: "mauramir",    gap: "+22.441" },
+      { driver: "huelkenberg", gap: "+23.122" },
+      { driver: "sainz",       gap: "+23.880" },
+      { driver: "leclerc",     gap: "+25.883" },
+      { driver: "hadjar",      gap: "+29.138" },
+      { driver: "stroll",      gap: "+32.254" },
+      { driver: "piastri",     gap: "+32.642" },
+      { driver: "bearman",     gap: "+34.576" },
+      { driver: "colapinto",   gap: "+37.966" },
+      { driver: "lindblad",    gap: "+38.023" },
+      { driver: "lawson",      gap: "+40.338" },
+      { driver: "verstappen",  dnf: true, gap: "Mechanisches Versagen, Runde 14" },
     ]
   },
   {
-    round: 4, gp: "Silverstone", circuit: "Silverstone Circuit", date: "2026-07-05", laps: 15,
-    fastestLap: "timo",
+    round: 3, gp: "Ungarn", circuit: "Hungaroring", date: "2026-07-27", laps: 18,
+    fastestLap: "emefka",
     results: [
-      { driver: "emefka", gap: "31:20.744" },
-      { driver: "timo",   gap: "+0.912" },
-      { driver: "basti",  gap: "+7.408" },
-      { driver: "nico",   gap: "+12.116" },
-      { driver: "lars",   gap: "+15.887" },
-      { driver: "jana",   gap: "+29.401" },
-    ]
-  },
-  {
-    round: 5, gp: "Spa-Francorchamps", circuit: "Circuit de Spa", date: "2026-07-19", laps: 13,
-    fastestLap: "basti",
-    results: [
-      { driver: "basti",  gap: "34:55.203" },
-      { driver: "emefka", gap: "+5.660" },
-      { driver: "nico",   gap: "+6.021" },
-      { driver: "timo",   gap: "+13.774" },
-      { driver: "jana",   gap: "+22.019" },
-      { driver: "lars",   gap: "+35.442" },
+      { driver: "verstappen",  gap: "25:31.257" },
+      { driver: "russell",     gap: "+1.725" },
+      { driver: "leclerc",     gap: "+2.869" },
+      { driver: "norris",      gap: "+3.442" },
+      { driver: "alonso",      gap: "+3.990" },
+      { driver: "sainz",       gap: "+6.645" },
+      { driver: "gasly",       gap: "+7.457" },
+      { driver: "bottas",      gap: "+8.628" },
+      { driver: "ocon",        gap: "+13.022" },
+      { driver: "albon",       gap: "+13.434" },
+      { driver: "perez",       gap: "+15.249" },
+      { driver: "antonelli",   gap: "+16.347" },
+      { driver: "lawson",      gap: "+16.697" },
+      { driver: "colapinto",   gap: "+17.174" },
+      { driver: "lindblad",    gap: "+20.477" },
+      { driver: "stroll",      gap: "+22.469" },
+      { driver: "hadjar",      gap: "+23.478" },
+      { driver: "mauramir",    gap: "+35.768" },
+      { driver: "piastri",     gap: "+36.188" },
+      { driver: "emefka",      gap: "+46.877" },
+      { driver: "l1chtfloh",   gap: "+1:00.382" },
+      { driver: "bearman",     dnf: true, gap: "Mechanisches Versagen, Runde 14" },
     ]
   },
 ];
@@ -229,7 +288,7 @@ footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);font-si
 
 <div class="wrap">
   <header class="masthead">
-    <p class="eyebrow">F1 25 · Multiplayer</p>
+    <p class="eyebrow">F1 26 · MRL</p>
     <h1 id="title">Liga<span class="season">Saison</span></h1>
     <div class="meta">
       <div><b id="m-rounds">0</b>Rennen gefahren</div>
@@ -256,7 +315,7 @@ footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);font-si
   </section>
 
   <footer>
-    Private Liga-Auswertung zu F1&nbsp;25. Keine Verbindung zur Formula One Group, EA oder Codemasters.<br>
+    Private Liga-Auswertung zu F1&nbsp;26. Keine Verbindung zur Formula One Group, EA oder Codemasters.<br>
     Punkte nach 25-18-15-12-10-8-6-4-2-1<span id="flnote"></span>.
   </footer>
 </div>
@@ -307,7 +366,7 @@ function standings(){
 function renderHead(){
   const s = standings();
   $("#title").innerHTML = LEAGUE_NAME + '<span class="season">' + SEASON + '</span>';
-  document.title = LEAGUE_NAME + " — F1 25";
+  document.title = "F1 26 MRL — " + LEAGUE_NAME;
   $("#m-rounds").textContent = RACES.length + " / " + TOTAL_ROUNDS;
   $("#m-leader").textContent = s[0]?.name ?? "–";
   $("#m-drivers").textContent = DRIVERS.length;
@@ -327,7 +386,9 @@ function renderTower(){
         <div class="nm">${d.name}</div>
         <div class="tm">${d.team}</div>
       </div>
-      <div class="gap">${i===0 ? `${d.wins} Siege · ${d.podiums} Podien` : "−" + (lead - d.points)}</div>
+      <div class="gap">${i===0
+        ? `${d.wins} ${d.wins===1?"Sieg":"Siege"} · ${d.podiums} ${d.podiums===1?"Podium":"Podien"}`
+        : "−" + (lead - d.points)}</div>
       <div class="pts">${d.points}<small>PKT</small></div>
     </div>`).join("");
 }

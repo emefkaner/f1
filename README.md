@@ -1,7 +1,25 @@
-# Feierabend-Liga — F1 25 Multiplayer
+# F1 26 MRL — Monday Racing League
 
-Private Auswertungsseite für unsere F1-25-Multiplayer-Rennen. Eine einzelne,
+Private Auswertungsseite für unsere F1-26-Multiplayer-Rennen. Eine einzelne,
 in sich geschlossene `index.html` ohne Build-Schritt.
+
+Gewertet wird das komplette Feld, Menschen und KI gemischt — eine echte
+Meisterschaft über 22 Fahrer.
+
+## Woher die Ergebnisse kommen
+
+Nach dem Rennen im Spiel „Renndaten speichern" wählen. F1 schreibt dann eine
+CSV nach `%USERPROFILE%\OneDrive\Dokumente\My Games\F1 25\session results\`,
+benannt `session_results_TTMMJJJJ_HHMM.csv`. Darin stehen Klassifizierung,
+Zeiten, beste Runden und die Vorfälle.
+
+Zwei Dinge fehlen der CSV: die Strecke und die Rundenzahl. Die Strecke steht im
+Nachbarordner `replays` im Dateinamen (gleicher Zeitstempel wie die CSV), die
+Rundenzahl ist hier aus Gesamtzeit und schnellster Runde geschätzt.
+
+Und: Das Spiel schreibt nur den eigenen Namen in die CSV — alle anderen
+Mitfahrer heißen dort `Spieler:in`. Wer das war, muss von Hand zugeordnet
+werden.
 
 ## Daten pflegen
 
