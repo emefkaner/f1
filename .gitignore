@@ -1,0 +1,20 @@
+# Python (Telemetrie-Recorder)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Rohmitschnitte der Telemetrie – gehören nicht ins öffentliche Repo
+telemetry_raw/
+*.f1log
+*.pcap
+
+# Backups, die das Skript vor dem Schreiben anlegt
+index.html.bak*
+
+# OS / Editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
