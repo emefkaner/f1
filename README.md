@@ -37,6 +37,27 @@ Alles Inhaltliche steht ganz oben im ersten `<script>`-Block der `index.html`:
 bei einem Ausfall `dnf: true`. Punkte, Siege, Podien und die Gesamtwertung
 rechnet die Seite selbst aus, nach 25-18-15-12-10-8-6-4-2-1.
 
+## Was hier liegt
+
+| Pfad | Zweck |
+|---|---|
+| `index.html` | die Seite selbst, einzige Quelle der Daten |
+| `archiv/` | Kopien der session-results-CSVs aus F1 25 |
+| `schriften/` | Titillium Web und JetBrains Mono als woff2 |
+| `mrl-standalone.html` | Kopie der Seite mit eingebetteten Schriften |
+| `kopien-aktualisieren.ps1` | erzeugt die beiden oberen aus `index.html` |
+| `CNAME` | sagt GitHub Pages, dass die Seite unter `f1.emefka.com` läuft |
+
+`mrl-standalone.html` ist eine abgeleitete Kopie und nicht versioniert. Sie
+kommt ohne jeden externen Request aus — praktisch zum Weitergeben oder für
+einen Webspace, auf dem keine Google-Fonts-Anfragen rausgehen sollen.
+
+Nach jedem eingetragenen Rennen einmal laufen lassen:
+
+```bash
+powershell -ExecutionPolicy Bypass -File ./kopien-aktualisieren.ps1
+```
+
 ## Lokal ansehen
 
 `index.html` einfach im Browser öffnen — kein Server nötig.

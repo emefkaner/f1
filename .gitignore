@@ -12,6 +12,15 @@ telemetry_raw/
 # Backups, die das Skript vor dem Schreiben anlegt
 index.html.bak*
 
+# EA-Spezifikation – urheberrechtlich geschützt, gehört nicht ins
+# öffentliche Repo. Bleibt lokal liegen, wird für den UDP-Recorder gebraucht.
+telemtry.txt
+telemetry.txt
+
+# Abgeleitete Kopie der Seite mit eingebetteten Schriften.
+# Wird aus index.html erzeugt, muss nicht mitversioniert werden.
+mrl-standalone.html
+
 # OS / Editor
 Thumbs.db
 desktop.ini
