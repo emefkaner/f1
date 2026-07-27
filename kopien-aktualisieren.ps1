@@ -79,12 +79,22 @@ $ziel = Join-Path $repo "mrl-standalone.html"
 
 # ── 3. Kontrolle ─────────────────────────────────────────────────────
 $c = [System.IO.File]::ReadAllText($ziel, [System.Text.Encoding]::UTF8)
-$extern   = ([regex]::Matches($c, 'https?://(?!www\.w3\.org)')).Count
-$mojibake = ([regex]::Matches($c, 'Ã')).Count
+
+# Nur nachgeladene Ressourcen zaehlen - Schriften, Skripte, Bilder, CSS.
+# Normale <a href="...">-Verweise sind gewollt und keine Requests.
+$ressourcen = ([regex]::Matches($c,
+  '(?i)(<script[^>]+\bsrc\s*=|<link[^>]+\bhref\s*=|<img[^>]+\bsrc\s*=|url\()\s*["'']?\s*https?://')).Count
+# Die Navigationslinks stehen als URLs im LINKS-Array und werden erst zur
+# Laufzeit zu <a>-Elementen - deshalb hier die URLs selbst zaehlen.
+$verweise = ([regex]::Matches($c, 'https?://(?!www\.w3\.org)')).Count - $ressourcen
+$mojibake = ([regex]::Matches($c, [char]0x00C3)).Count
 $schnitte = ([regex]::Matches($c, '@font-face')).Count
 
 Write-Host ""
 Write-Host "mrl-standalone.html: $([math]::Round((Get-Item $ziel).Length/1KB)) KB, $schnitte Schriftschnitte"
-if ($extern -gt 0)   { Write-Warning "$extern externe URL(s) enthalten - bitte prüfen" }
-if ($mojibake -gt 0) { Write-Warning "$mojibake kaputte Umlaute - Encoding prüfen" }
-if ($extern -eq 0 -and $mojibake -eq 0) { Write-Host "Kontrolle bestanden: keine externen Requests, Umlaute intakt." }
+Write-Host "Ausgehende Links: $verweise (gewollt, werden nicht nachgeladen)"
+if ($ressourcen -gt 0) { Write-Warning "$ressourcen nachgeladene Ressource(n) von extern - bitte pruefen" }
+if ($mojibake -gt 0)   { Write-Warning "$mojibake kaputte Umlaute - Encoding pruefen" }
+if ($ressourcen -eq 0 -and $mojibake -eq 0) {
+  Write-Host "Kontrolle bestanden: laedt nichts von extern, Umlaute intakt."
+}
