@@ -41,33 +41,37 @@ const FASTEST_LAP_POINT = false;   // true = +1 Punkt für schnellste Runde (nur
    Hamilton und Bortoleto sind nur in Runde 1 gefahren, danach war der
    2026er Kader aktiv (Bottas, Pérez und Lindblad kamen dafür dazu).      */
 
-const DRIVERS = [
-  { id: "emefka",      name: "emefka",     tag: "EMF", team: "Audi",         color: "#00B3A4" },
-  { id: "l1chtfloh",   name: "L1chtfloh",  tag: "L1C", team: "Audi",         color: "#00B3A4" },
-  { id: "mauramir",    name: "mauramir",   tag: "MAU", team: "Ferrari",      color: "#E8002D" },
+/* tag steht unter dem Namen neben dem Team: bei euch der Gamertag,
+   bei der KI das übliche Dreibuchstaben-Kürzel.                        */
 
-  { id: "verstappen",  name: "Verstappen", tag: "VER", team: "Red Bull",     color: "#3671C6" },
-  { id: "hadjar",      name: "Hadjar",     tag: "HAD", team: "Red Bull",     color: "#3671C6" },
-  { id: "russell",     name: "Russell",    tag: "RUS", team: "Mercedes",     color: "#27F4D2" },
-  { id: "antonelli",   name: "Antonelli",  tag: "ANT", team: "Mercedes",     color: "#27F4D2" },
-  { id: "leclerc",     name: "Leclerc",    tag: "LEC", team: "Ferrari",      color: "#E8002D" },
-  { id: "hamilton",    name: "Hamilton",   tag: "HAM", team: "Ferrari",      color: "#E8002D" },
-  { id: "norris",      name: "Norris",     tag: "NOR", team: "McLaren",      color: "#FF8000" },
-  { id: "piastri",     name: "Piastri",    tag: "PIA", team: "McLaren",      color: "#FF8000" },
-  { id: "alonso",      name: "Alonso",     tag: "ALO", team: "Aston Martin", color: "#229971" },
-  { id: "stroll",      name: "Stroll",     tag: "STR", team: "Aston Martin", color: "#229971" },
-  { id: "sainz",       name: "Sainz",      tag: "SAI", team: "Williams",     color: "#64C4FF" },
-  { id: "albon",       name: "Albon",      tag: "ALB", team: "Williams",     color: "#64C4FF" },
-  { id: "gasly",       name: "Gasly",      tag: "GAS", team: "Alpine",       color: "#FF87BC" },
-  { id: "colapinto",   name: "Colapinto",  tag: "COL", team: "Alpine",       color: "#FF87BC" },
-  { id: "ocon",        name: "Ocon",       tag: "OCO", team: "Haas",         color: "#B6BABD" },
-  { id: "bearman",     name: "Bearman",    tag: "BEA", team: "Haas",         color: "#B6BABD" },
-  { id: "huelkenberg", name: "Hülkenberg", tag: "HUL", team: "Audi",         color: "#00B3A4" },
-  { id: "bottas",      name: "Bottas",     tag: "BOT", team: "Cadillac",     color: "#C9A227" },
-  { id: "perez",       name: "Pérez",      tag: "PER", team: "Cadillac",     color: "#C9A227" },
-  { id: "lawson",      name: "Lawson",     tag: "LAW", team: "Racing Bulls", color: "#6692FF" },
-  { id: "lindblad",    name: "Lindblad",   tag: "LIN", team: "Racing Bulls", color: "#6692FF" },
-  { id: "bortoleto",   name: "Bortoleto",  tag: "BOR", team: "Kick Sauber",  color: "#52E252" },
+const DRIVERS = [
+  // human: true → lila Farbstreifen, lila Name, dunkelrote Platzierung
+  { id: "emefka",      name: "Marc Ferdinand Körner", tag: "emefka",    team: "Audi",    color: "#B026FF", human: true },
+  { id: "l1chtfloh",   name: "Matthew McMauro",       tag: "L1chtfloh", team: "Audi",    color: "#B026FF", human: true },
+  { id: "mauramir",    name: "Maurice Arpogaus",      tag: "mauramir",  team: "Ferrari", color: "#B026FF", human: true },
+
+  { id: "verstappen",  name: "Max Verstappen",        tag: "VER", team: "Red Bull",     color: "#3671C6" },
+  { id: "hadjar",      name: "Isack Hadjar",          tag: "HAD", team: "Red Bull",     color: "#3671C6" },
+  { id: "russell",     name: "George Russell",        tag: "RUS", team: "Mercedes",     color: "#27F4D2" },
+  { id: "antonelli",   name: "Andrea Kimi Antonelli", tag: "ANT", team: "Mercedes",     color: "#27F4D2" },
+  { id: "leclerc",     name: "Charles Leclerc",       tag: "LEC", team: "Ferrari",      color: "#E8002D" },
+  { id: "hamilton",    name: "Lewis Hamilton",        tag: "HAM", team: "Ferrari",      color: "#E8002D" },
+  { id: "norris",      name: "Lando Norris",          tag: "NOR", team: "McLaren",      color: "#FF8000" },
+  { id: "piastri",     name: "Oscar Piastri",         tag: "PIA", team: "McLaren",      color: "#FF8000" },
+  { id: "alonso",      name: "Fernando Alonso",       tag: "ALO", team: "Aston Martin", color: "#229971" },
+  { id: "stroll",      name: "Lance Stroll",          tag: "STR", team: "Aston Martin", color: "#229971" },
+  { id: "sainz",       name: "Carlos Sainz",          tag: "SAI", team: "Williams",     color: "#64C4FF" },
+  { id: "albon",       name: "Alexander Albon",       tag: "ALB", team: "Williams",     color: "#64C4FF" },
+  { id: "gasly",       name: "Pierre Gasly",          tag: "GAS", team: "Alpine",       color: "#FF87BC" },
+  { id: "colapinto",   name: "Franco Colapinto",      tag: "COL", team: "Alpine",       color: "#FF87BC" },
+  { id: "ocon",        name: "Esteban Ocon",          tag: "OCO", team: "Haas",         color: "#B6BABD" },
+  { id: "bearman",     name: "Oliver Bearman",        tag: "BEA", team: "Haas",         color: "#B6BABD" },
+  { id: "huelkenberg", name: "Nico Hülkenberg",       tag: "HUL", team: "Audi",         color: "#00B3A4" },
+  { id: "bottas",      name: "Valtteri Bottas",       tag: "BOT", team: "Cadillac",     color: "#C9A227" },
+  { id: "perez",       name: "Sergio Pérez",          tag: "PER", team: "Cadillac",     color: "#C9A227" },
+  { id: "lawson",      name: "Liam Lawson",           tag: "LAW", team: "Racing Bulls", color: "#6692FF" },
+  { id: "lindblad",    name: "Arvid Lindblad",        tag: "LIN", team: "Racing Bulls", color: "#6692FF" },
+  { id: "bortoleto",   name: "Gabriel Bortoleto",     tag: "BOR", team: "Kick Sauber",  color: "#52E252" },
 ];
 
 /* Ergebnisse 1:1 aus den Spiel-CSVs, volle Zielreihenfolge inklusive KI.
@@ -175,6 +179,8 @@ const TOTAL_ROUNDS = 10;   // geplante Saisonlänge
   --white:#f2f2f4;
   --muted:#8a8a94;
   --purple:#a03cf0;
+  --human:#b026ff;
+  --darkred:#6b0713;
   --gold:#ffd23f;
   --silver:#c9cbd1;
   --bronze:#c8813f;
@@ -233,6 +239,8 @@ h2::after{content:"";flex:1;height:1px;background:var(--line)}
 .who{min-width:0}
 .who .nm{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .who .tm{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.who .tag{font-family:var(--mono);font-weight:400;letter-spacing:.02em;text-transform:none;color:#61616c}
+.who .tag::before{content:"·";margin:0 6px}
 .gap{font-family:var(--mono);font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
 .pts{font-family:var(--mono);font-weight:700;font-size:19px;text-align:right;min-width:52px}
 .pts small{font-size:10px;color:var(--muted);font-weight:400;display:block;letter-spacing:.1em}
@@ -243,7 +251,11 @@ table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:13px
 th,td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
 thead th{
   background:#000;font-family:var(--sans);font-size:10px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);position:sticky;top:0
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;
+  padding:8px 12px;vertical-align:bottom
+}
+thead th .rnd{
+  display:block;color:var(--red);font-size:9px;letter-spacing:.18em;margin-bottom:4px
 }
 tbody th{
   text-align:left;font-family:var(--sans);font-weight:700;font-size:14px;
@@ -275,6 +287,11 @@ tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
 .fl{color:var(--purple);font-weight:700}
 .row.dnf .pos{background:#1c1c22;color:#5a5a64}
 .row.dnf .nm{color:var(--muted)}
+
+/* ── Wir drei ──────────────────────────────────────── */
+.row.human .pos{background:var(--darkred);color:#fff}
+.row.human .nm{color:var(--human)}
+tbody th.human{background:var(--darkred);color:#fff}
 
 footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);font-size:11px;color:#55555e;line-height:1.7}
 
@@ -379,12 +396,12 @@ function renderTower(){
   const s = standings();
   const lead = s[0]?.points ?? 0;
   $("#tower").innerHTML = s.map((d,i) => `
-    <div class="row ${i===0?"p1":""}">
+    <div class="row ${i===0?"p1":""} ${d.human?"human":""}">
       <div class="pos">${i+1}</div>
       <div class="spine" style="background:${d.color}"></div>
       <div class="who">
         <div class="nm">${d.name}</div>
-        <div class="tm">${d.team}</div>
+        <div class="tm">${d.team}${d.tag ? ' <span class="tag">' + d.tag + "</span>" : ""}</div>
       </div>
       <div class="gap">${i===0
         ? `${d.wins} ${d.wins===1?"Sieg":"Siege"} · ${d.podiums} ${d.podiums===1?"Podium":"Podien"}`
@@ -396,7 +413,8 @@ function renderTower(){
 /* Saison-Matrix */
 function renderMatrix(){
   const s = standings();
-  const head = RACES.map(r => `<th title="${r.gp}">R${r.round}</th>`).join("");
+  const head = RACES.map(r =>
+    `<th title="${r.circuit}"><span class="rnd">R${r.round}</span>${r.gp}</th>`).join("");
   const body = s.map(d => {
     const cells = RACES.map((r,i) => {
       const e = PTS_BY_RACE[i][d.id];
@@ -408,7 +426,7 @@ function renderMatrix(){
       return `<td class="cell ${cls}">${e.pos}</td>`;
     }).join("");
     return `<tr>
-      <th style="border-left-color:${d.color}">${d.name}</th>
+      <th class="${d.human?"human":""}" style="border-left-color:${d.color}">${d.name}</th>
       ${cells}<td class="total">${d.points}</td></tr>`;
   }).join("");
   $("#matrix").innerHTML =
@@ -427,12 +445,12 @@ function renderRace(idx){
     const d = D[res.driver] || { name: res.driver, team: "?", color: "#555" };
     const e = pts[res.driver];
     const isFl = r.fastestLap === res.driver;
-    return `<div class="row ${res.dnf ? "dnf" : ""} ${i===0 && !res.dnf ? "p1" : ""}">
+    return `<div class="row ${res.dnf ? "dnf" : ""} ${i===0 && !res.dnf ? "p1" : ""} ${d.human ? "human" : ""}">
       <div class="pos">${res.dnf ? "–" : e.pos}</div>
       <div class="spine" style="background:${d.color}"></div>
       <div class="who">
         <div class="nm">${d.name}${isFl ? ' <span class="fl">FL</span>' : ""}</div>
-        <div class="tm">${d.team}</div>
+        <div class="tm">${d.team}${d.tag ? ' <span class="tag">' + d.tag + "</span>" : ""}</div>
       </div>
       <div class="gap">${res.dnf ? (res.gap || "DNF") : (res.gap || "")}</div>
       <div class="pts">${res.dnf ? 0 : e.points}<small>PKT</small></div>
