@@ -194,9 +194,39 @@ const RACES = [
       { driver: "bearman",     dnf: true, gap: "Mechanisches Versagen, Runde 14" },
     ]
   },
+  {
+    round: 4, gp: "Suzuka", circuit: "Suzuka International Racing Course", date: "2026-08-03", laps: 13,
+    fastestLap: "emefka",
+    penalties: [
+      { t: "15:54.097", lap: 10, driver: "ocon",   what: "Mechanisches Versagen", pen: "DNF" },
+      { t: "19:28.969", lap: 12, driver: "emefka", what: "Kurve abgekürzt",       pen: "3 Sek." },
+    ],
+    results: [
+      { driver: "emefka",      gap: "21:12.915" },
+      { driver: "mauramir",    gap: "+4.850" },
+      { driver: "verstappen",  gap: "+5.376" },
+      { driver: "russell",     gap: "+5.714" },
+      { driver: "piastri",     gap: "+7.914" },
+      { driver: "alonso",      gap: "+9.172" },
+      { driver: "norris",      gap: "+9.465" },
+      { driver: "gasly",       gap: "+12.863" },
+      { driver: "huelkenberg", gap: "+19.598" },
+      { driver: "hamilton",    gap: "+21.076" },
+      { driver: "antonelli",   gap: "+22.934" },
+      { driver: "colapinto",   gap: "+27.116" },
+      { driver: "lawson",      gap: "+27.586" },
+      { driver: "bottas",      gap: "+27.955" },
+      { driver: "bearman",     gap: "+28.545" },
+      { driver: "stroll",      gap: "+29.335" },
+      { driver: "sainz",       gap: "+30.063" },
+      { driver: "lindblad",    gap: "+30.429" },
+      { driver: "albon",       gap: "+30.673" },
+      { driver: "perez",       gap: "+31.711" },
+      { driver: "hadjar",      gap: "+32.266" },
+      { driver: "ocon",        dnf: true, gap: "Mechanisches Versagen, Runde 10" },
+    ]
+  },
 ];
-
-const TOTAL_ROUNDS = 10;   // geplante Saisonlänge
 
 /* Navigation ganz oben. Neue Einträge einfach anhängen — Reihenfolge hier
    ist die Reihenfolge auf der Seite.
@@ -496,7 +526,7 @@ function renderHead(){
   const s = standings();
   $("#title").innerHTML = LEAGUE_NAME + '<span class="season">' + SEASON + '</span>';
   document.title = "F1 26 MRL — " + LEAGUE_NAME;
-  $("#m-rounds").textContent = RACES.length + " / " + TOTAL_ROUNDS;
+  $("#m-rounds").textContent = RACES.length;
   $("#m-leader").textContent = s[0]?.name ?? "–";
   $("#m-drivers").textContent = DRIVERS.length;
   $("#m-next").textContent = "Runde " + (RACES.length + 1);

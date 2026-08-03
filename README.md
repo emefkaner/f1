@@ -28,10 +28,12 @@ Alles Inhaltliche steht ganz oben im ersten `<script>`-Block der `index.html`:
 | Konstante | Bedeutung |
 |---|---|
 | `LEAGUE_NAME`, `SEASON` | Überschrift der Seite |
-| `TOTAL_ROUNDS` | geplante Saisonlänge |
 | `FASTEST_LAP_POINT` | `true` = +1 Punkt für die schnellste Runde (nur Top 10) |
-| `DRIVERS` | `id`, `name`, `tag`, `team`, `color` |
-| `RACES` | pro Rennen `round`, `gp`, `circuit`, `date`, `laps`, `fastestLap`, `results` |
+| `LINKS` | Navigation ganz oben: `label`, `url`, optional `note` |
+| `DRIVERS` | `id`, `name`, `tag`, `team`, `color`, bei euch dreien `human: true` |
+| `RACES` | pro Rennen `round`, `gp`, `circuit`, `date`, `laps`, `fastestLap`, `results`, `penalties` |
+
+Die Saisonlänge steht bewusst nirgends — sie ist offen.
 
 `results` ist die Zielreihenfolge von P1 abwärts, jeweils `driver` + `gap`;
 bei einem Ausfall `dnf: true`. Punkte, Siege, Podien und die Gesamtwertung
