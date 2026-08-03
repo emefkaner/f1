@@ -38,11 +38,13 @@ const FASTEST_LAP_POINT = false;   // true = +1 Punkt für schnellste Runde (nur
 
    team ist jeweils das AKTUELLE Team (Stand 2026er Kader). Wer die Saison
    über gewechselt hat, steht hier trotzdem nur einmal:
-     Hadjar    Racing Bulls → Red Bull
-     Hülkenberg  Kick Sauber → Audi
+     Hadjar      Racing Bulls → Red Bull
+     Hülkenberg  Kick Sauber  → Audi
+     Bortoleto   Kick Sauber  → Audi
      L1chtfloh   Aston Martin → Cadillac → Audi
-   Hamilton und Bortoleto sind nur in Runde 1 gefahren, danach war der
-   2026er Kader aktiv (Bottas, Pérez und Lindblad kamen dafür dazu).      */
+   In Runde 1 lief noch der 2025er Kader, ab Runde 2 der 2026er — dadurch
+   kamen Bottas, Pérez und Lindblad dazu. Nicht jeder ist in jedem Rennen
+   dabei; wer fehlt, bekommt in der Saisonübersicht einen Strich.         */
 
 /* tag steht unter dem Namen neben dem Team: bei euch der Gamertag,
    bei der KI das übliche Dreibuchstaben-Kürzel.                        */
@@ -74,7 +76,7 @@ const DRIVERS = [
   { id: "perez",       name: "Sergio Pérez",          tag: "PER", team: "Cadillac",     color: "#C9A227" },
   { id: "lawson",      name: "Liam Lawson",           tag: "LAW", team: "Racing Bulls", color: "#6692FF" },
   { id: "lindblad",    name: "Arvid Lindblad",        tag: "LIN", team: "Racing Bulls", color: "#6692FF" },
-  { id: "bortoleto",   name: "Gabriel Bortoleto",     tag: "BOR", team: "Kick Sauber",  color: "#52E252" },
+  { id: "bortoleto",   name: "Gabriel Bortoleto",     tag: "BOR", team: "Audi",         color: "#00B3A4" },
 ];
 
 /* Ergebnisse 1:1 aus den Spiel-CSVs, volle Zielreihenfolge inklusive KI.
@@ -127,7 +129,41 @@ const RACES = [
     ]
   },
   {
-    round: 2, gp: "Spa-Francorchamps", circuit: "Circuit de Spa-Francorchamps", date: "2026-07-13", laps: 22,
+    /* Einziges Rennen ohne Spiel-CSV — alles aus einem Screenshot der
+       Live-Zeitentafel abgelesen. Deren Spalte war "Intervall", also der
+       Abstand zum Vordermann; die gap-Werte hier sind daraus aufsummierte
+       Rückstände auf den Sieger. Hadjar zeigte dort -24,357 (negativ,
+       vermutlich Artefakt der laufenden Schlussrunde), deshalb ist ab ihm
+       nichts mehr berechenbar. Gesamtzeit, schnellste Runde und Strafen
+       standen nicht auf dem Bild.                                        */
+    round: 2, gp: "Silverstone", circuit: "Silverstone Circuit", date: "2026-07-06", laps: 26,
+    results: [
+      { driver: "russell",     gap: "—" },
+      { driver: "norris",      gap: "+1.802" },
+      { driver: "mauramir",    gap: "+9.714" },
+      { driver: "piastri",     gap: "+10.427" },
+      { driver: "verstappen",  gap: "+15.380" },
+      { driver: "antonelli",   gap: "+15.790" },
+      { driver: "albon",       gap: "+20.856" },
+      { driver: "sainz",       gap: "+23.787" },
+      { driver: "leclerc",     gap: "+24.042" },
+      { driver: "alonso",      gap: "+37.419" },
+      { driver: "emefka",      gap: "+37.684" },
+      { driver: "gasly",       gap: "+40.357" },
+      { driver: "bearman",     gap: "+42.027" },
+      { driver: "lawson",      gap: "+49.483" },
+      { driver: "colapinto",   gap: "+51.574" },
+      { driver: "perez",       gap: "+55.731" },
+      { driver: "bortoleto",   gap: "+55.984" },
+      { driver: "bottas",      gap: "+61.307" },
+      { driver: "stroll",      gap: "+61.922" },
+      { driver: "hadjar",      gap: "—" },
+      { driver: "lindblad",    gap: "—" },
+      { driver: "ocon",        dnf: true, gap: "DNF" },
+    ]
+  },
+  {
+    round: 3, gp: "Spa-Francorchamps", circuit: "Circuit de Spa-Francorchamps", date: "2026-07-13", laps: 22,
     fastestLap: "emefka",
     penalties: [
       { t: "0:26.866",  lap: 1,  driver: "emefka",     what: "Kollision mit Leclerc, eine Position gutgemacht", pen: "10 Sek. Zeitstrafe" },
@@ -159,7 +195,7 @@ const RACES = [
     ]
   },
   {
-    round: 3, gp: "Ungarn", circuit: "Hungaroring", date: "2026-07-27", laps: 18,
+    round: 4, gp: "Ungarn", circuit: "Hungaroring", date: "2026-07-27", laps: 18,
     fastestLap: "emefka",
     penalties: [
       { t: "0:38.849",  lap: 1,  driver: "piastri",   what: "Gelbe Flagge ignoriert",   pen: "10 Sek. Zeitstrafe" },
@@ -195,7 +231,7 @@ const RACES = [
     ]
   },
   {
-    round: 4, gp: "Suzuka", circuit: "Suzuka International Racing Course", date: "2026-08-03", laps: 13,
+    round: 5, gp: "Suzuka", circuit: "Suzuka International Racing Course", date: "2026-08-03", laps: 13,
     fastestLap: "emefka",
     penalties: [
       { t: "15:54.097", lap: 10, driver: "ocon",   what: "Mechanisches Versagen", pen: "DNF" },
