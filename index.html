@@ -262,6 +262,47 @@ const RACES = [
       { driver: "ocon",        dnf: true, gap: "Mechanisches Versagen, Runde 10" },
     ]
   },
+  {
+    round: 6, gp: "Zandvoort", circuit: "Circuit Zandvoort", date: "2026-08-24", laps: 36,
+    fastestLap: "emefka",
+    /* Sprintwochenende. Der Sprint lief um 22:40, das Spiel hat dafür aber
+       keine CSV geschrieben — nur ein Replay. Sobald die Ergebnisse da sind,
+       hier eintragen:
+         sprint: { laps: 15, results: [ { driver: "…", gap: "…" }, … ] }
+       Punkte dafür nach SPRINT_POINTS, siehe ganz unten im Rechenteil.     */
+    penalties: [
+      { t: "5:03.096",  lap: 4,  driver: "colapinto", what: "Mechanisches Versagen",  pen: "DNF" },
+      { t: "12:51.174", lap: 10, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
+      { t: "23:38.726", lap: 18, driver: "piastri",   what: "Mechanisches Versagen",  pen: "DNF" },
+      { t: "32:21.597", lap: 25, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
+      { t: "33:52.221", lap: 26, driver: "emefka",    what: "Kurve abgekürzt",         pen: "3 Sek." },
+      { t: "46:48.591", lap: 36, driver: "emefka",    what: "Nicht erfüllte Strafe",   pen: "10 Sek." },
+    ],
+    results: [
+      { driver: "mauramir",    gap: "46:40.551" },
+      { driver: "emefka",      gap: "+21.023" },
+      { driver: "verstappen",  gap: "+25.128" },
+      { driver: "russell",     gap: "+39.404" },
+      { driver: "huelkenberg", gap: "+40.066" },
+      { driver: "hamilton",    gap: "+41.412" },
+      { driver: "alonso",      gap: "+43.114" },
+      { driver: "norris",      gap: "+43.260" },
+      { driver: "bottas",      gap: "+48.485" },
+      { driver: "sainz",       gap: "+52.087" },
+      { driver: "lawson",      gap: "+52.144" },
+      { driver: "albon",       gap: "+55.166" },
+      { driver: "ocon",        gap: "+56.351" },
+      { driver: "bearman",     gap: "+58.848" },
+      { driver: "antonelli",   gap: "+58.933" },
+      { driver: "gasly",       gap: "+1:01.982" },
+      { driver: "hadjar",      gap: "+1:05.121" },
+      { driver: "perez",       gap: "+1:05.320" },
+      { driver: "stroll",      gap: "+1:05.463" },
+      { driver: "lindblad",    gap: "+1:05.832" },
+      { driver: "piastri",     dnf: true, gap: "Mechanisches Versagen, Runde 18" },
+      { driver: "colapinto",   dnf: true, gap: "Mechanisches Versagen, Runde 4" },
+    ]
+  },
 ];
 
 /* Navigation ganz oben. Neue Einträge einfach anhängen — Reihenfolge hier
@@ -501,29 +542,41 @@ table.pens .pp.out{color:#5f5f6a}
 </div>
 
 <script>
-const POINTS = [25,18,15,12,10,8,6,4,2,1];
+const POINTS        = [25,18,15,12,10,8,6,4,2,1];
+const SPRINT_POINTS = [8,7,6,5,4,3,2,1];   // wie in der echten F1
 const D = Object.fromEntries(DRIVERS.map(d => [d.id, d]));
 const $ = s => document.querySelector(s);
 
-/* Punkte eines Rennens berechnen */
-function racePoints(race){
+/* Zielreihenfolge in Platz und Punkte übersetzen. Ausfälle werden
+   übersprungen und bekommen keine Platzziffer. */
+function classify(results, table){
   const out = {};
   let pos = 0;
-  race.results.forEach(r => {
+  results.forEach(r => {
     if (r.dnf) return;
-    const p = POINTS[pos] ?? 0;
-    out[r.driver] = { pos: ++pos && pos, points: p };
+    pos++;
+    out[r.driver] = { pos, points: table[pos - 1] ?? 0 };
   });
-  if (FASTEST_LAP_POINT && race.fastestLap && out[race.fastestLap]?.pos <= 10){
-    out[race.fastestLap].points += 1;
+  return out;
+}
+
+function racePoints(race){
+  const out = classify(race.results, POINTS);
+  const fl = race.fastestLap && out[race.fastestLap];
+  if (fl){
     out[race.fastestLap].fl = true;
-  } else if (race.fastestLap && out[race.fastestLap]){
-    out[race.fastestLap].fl = true;
+    if (FASTEST_LAP_POINT && out[race.fastestLap].pos <= 10) out[race.fastestLap].points += 1;
   }
   return out;
 }
 
+/* Sprint ist optional — ohne sprint-Block gibt es hier schlicht nichts. */
+function sprintPoints(race){
+  return race.sprint ? classify(race.sprint.results, SPRINT_POINTS) : null;
+}
+
 const PTS_BY_RACE = RACES.map(racePoints);
+const SPR_BY_RACE = RACES.map(sprintPoints);
 
 /* Gesamtwertung */
 function standings(){
@@ -537,6 +590,12 @@ function standings(){
       if (r.pos <= 3) e.podiums++;
       if (r.fl) e.fls++;
       e.best = Math.min(e.best, r.pos);
+    });
+    /* Sprintpunkte zählen für die Meisterschaft, aber ein Sprintsieg ist
+       kein Rennsieg — Siege und Podien bleiben dem Hauptrennen vorbehalten. */
+    const s = SPR_BY_RACE[i];
+    if (s) Object.entries(s).forEach(([id, r]) => {
+      const e = by[id]; if (e) e.points += r.points;
     });
   });
   return t.sort((a,b) => b.points - a.points || b.wins - a.wins || a.best - b.best);
@@ -592,7 +651,8 @@ function renderTower(){
 function renderMatrix(){
   const s = standings();
   const head = RACES.map(r =>
-    `<th title="${r.circuit}"><span class="rnd">R${r.round}</span>${r.gp}</th>`).join("");
+    `<th title="${r.circuit}${r.sprint ? " · mit Sprint" : ""}">`
+    + `<span class="rnd">R${r.round}${r.sprint ? " · S" : ""}</span>${r.gp}</th>`).join("");
   const body = s.map(d => {
     const cells = RACES.map((r,i) => {
       const e = PTS_BY_RACE[i][d.id];
@@ -612,17 +672,12 @@ function renderMatrix(){
      <tbody>${body}</tbody>`;
 }
 
-/* Einzelrennen */
-function renderRace(idx){
-  const r = RACES[idx];
-  const pts = PTS_BY_RACE[idx];
-  document.querySelectorAll(".chip").forEach((c,i) =>
-    c.setAttribute("aria-selected", String(i === idx)));
-
-  const rows = r.results.map((res, i) => {
+/* Eine Ergebnisliste als Timing Tower — für Rennen und Sprint gleichermaßen */
+function towerRows(results, pts, flDriver){
+  return results.map((res, i) => {
     const d = D[res.driver] || { name: res.driver, team: "?", color: "#555" };
     const e = pts[res.driver];
-    const isFl = r.fastestLap === res.driver;
+    const isFl = flDriver === res.driver;
     return `<div class="row ${res.dnf ? "dnf" : ""} ${i===0 && !res.dnf ? "p1" : ""} ${d.human ? "human" : ""}">
       <div class="pos">${res.dnf ? "–" : e.pos}</div>
       <div class="spine" style="background:${d.color}"></div>
@@ -634,6 +689,16 @@ function renderRace(idx){
       <div class="pts">${res.dnf ? 0 : e.points}<small>PKT</small></div>
     </div>`;
   }).join("");
+}
+
+/* Einzelrennen */
+function renderRace(idx){
+  const r = RACES[idx];
+  const pts = PTS_BY_RACE[idx];
+  document.querySelectorAll(".chip").forEach((c,i) =>
+    c.setAttribute("aria-selected", String(i === idx)));
+
+  const rows = towerRows(r.results, pts, r.fastestLap);
 
   const date = new Date(r.date + "T12:00:00")
     .toLocaleDateString("de-DE", { day:"2-digit", month:"long", year:"numeric" });
@@ -649,12 +714,18 @@ function renderRace(idx){
     </tr>`;
   }).join("");
 
+  const spr = SPR_BY_RACE[idx];
+  const sprintBlock = spr ? `
+    <h3 class="pentitle">Sprint${r.sprint.laps ? " · " + r.sprint.laps + " Runden" : ""}</h3>
+    <div class="tower">${towerRows(r.sprint.results, spr, r.sprint.fastestLap)}</div>` : "";
+
   $("#race").innerHTML = `
     <div class="racehead">
       <h3>${r.gp}</h3>
-      <span>${r.circuit} · ${r.laps} Runden · ${date}</span>
+      <span>${r.circuit} · ${r.laps} Runden · ${date}${spr ? " · Sprintwochenende" : ""}</span>
     </div>
     <div class="tower">${rows}</div>
+    ${sprintBlock}
     ${pens ? `<h3 class="pentitle">Strafen &amp; Vorfälle</h3>
       <div class="scroller"><table class="pens">
         <thead><tr><th>Zeit</th><th>Runde</th><th>Fahrer</th><th>Vorfall</th><th>Strafe</th></tr></thead>
