@@ -311,27 +311,33 @@ const RACES = [
       { t: "33:52.221", lap: 26, driver: "emefka",    what: "Kurve abgekürzt",         pen: "3 Sek." },
       { t: "46:48.591", lap: 36, driver: "emefka",    what: "Nicht erfüllte Strafe",   pen: "10 Sek." },
     ],
+    /* Zeiten sind um mauramirs nachträgliche Zehnsekundenstrafe korrigiert:
+       seine Zeit steigt von 46:40,551 auf 46:50,551, dadurch sinkt jeder
+       Rückstand auf ihn um exakt 10,000 s. Die Reihenfolge bleibt gleich,
+       weil nur die Zeit des Führenden verändert wurde. Die Originalwerte
+       stehen unverändert in archiv\session_results_24082026_2350.csv.     */
+    note: "Zeiten um mauramirs Strafe korrigiert",
     results: [
-      { driver: "mauramir",    gap: "46:40.551" },
-      { driver: "emefka",      gap: "+21.023" },
-      { driver: "verstappen",  gap: "+25.128" },
-      { driver: "russell",     gap: "+39.404" },
-      { driver: "huelkenberg", gap: "+40.066" },
-      { driver: "hamilton",    gap: "+41.412" },
-      { driver: "alonso",      gap: "+43.114" },
-      { driver: "norris",      gap: "+43.260" },
-      { driver: "bottas",      gap: "+48.485" },
-      { driver: "sainz",       gap: "+52.087" },
-      { driver: "lawson",      gap: "+52.144" },
-      { driver: "albon",       gap: "+55.166" },
-      { driver: "ocon",        gap: "+56.351" },
-      { driver: "bearman",     gap: "+58.848" },
-      { driver: "antonelli",   gap: "+58.933" },
-      { driver: "gasly",       gap: "+1:01.982" },
-      { driver: "hadjar",      gap: "+1:05.121" },
-      { driver: "perez",       gap: "+1:05.320" },
-      { driver: "stroll",      gap: "+1:05.463" },
-      { driver: "lindblad",    gap: "+1:05.832" },
+      { driver: "mauramir",    gap: "46:50.551" },
+      { driver: "emefka",      gap: "+11.023" },
+      { driver: "verstappen",  gap: "+15.128" },
+      { driver: "russell",     gap: "+29.404" },
+      { driver: "huelkenberg", gap: "+30.066" },
+      { driver: "hamilton",    gap: "+31.412" },
+      { driver: "alonso",      gap: "+33.114" },
+      { driver: "norris",      gap: "+33.260" },
+      { driver: "bottas",      gap: "+38.485" },
+      { driver: "sainz",       gap: "+42.087" },
+      { driver: "lawson",      gap: "+42.144" },
+      { driver: "albon",       gap: "+45.166" },
+      { driver: "ocon",        gap: "+46.351" },
+      { driver: "bearman",     gap: "+48.848" },
+      { driver: "antonelli",   gap: "+48.933" },
+      { driver: "gasly",       gap: "+51.982" },
+      { driver: "hadjar",      gap: "+55.121" },
+      { driver: "perez",       gap: "+55.320" },
+      { driver: "stroll",      gap: "+55.463" },
+      { driver: "lindblad",    gap: "+55.832" },
       { driver: "piastri",     dnf: true, gap: "Mechanisches Versagen, Runde 18" },
       { driver: "colapinto",   dnf: true, gap: "Mechanisches Versagen, Runde 4" },
     ]
@@ -502,6 +508,7 @@ tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
 .racehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-bottom:16px}
 .racehead h3{margin:0;font-size:27px;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:-.01em}
 .racehead span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.racehead .korr{color:#ff5a4d}
 .fl{color:var(--purple);font-weight:700}
 .row.dnf .pos{background:#1c1c22;color:#5a5a64}
 .row.dnf .nm{color:var(--muted)}
@@ -764,7 +771,7 @@ function renderRace(idx){
   $("#race").innerHTML = `
     <div class="racehead">
       <h3>${r.gp}</h3>
-      <span>${r.circuit} · ${r.laps} Runden · ${date}${spr ? " · Sprintwochenende" : ""}</span>
+      <span>${r.circuit} · ${r.laps} Runden · ${date}${spr ? " · Sprintwochenende" : ""}${r.note ? ' · <span class="korr">' + r.note + "</span>" : ""}</span>
     </div>
     <div class="tower">${rows}</div>
     ${sprintBlock}
