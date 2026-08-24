@@ -265,11 +265,41 @@ const RACES = [
   {
     round: 6, gp: "Zandvoort", circuit: "Circuit Zandvoort", date: "2026-08-24", laps: 36,
     fastestLap: "emefka",
-    /* Sprintwochenende. Der Sprint lief um 22:40, das Spiel hat dafür aber
-       keine CSV geschrieben — nur ein Replay. Sobald die Ergebnisse da sind,
-       hier eintragen:
-         sprint: { laps: 15, results: [ { driver: "…", gap: "…" }, … ] }
-       Punkte dafür nach SPRINT_POINTS, siehe ganz unten im Rechenteil.     */
+    /* Sprintwochenende. Für den Sprint gibt es keine CSV — das Spiel hat für
+       die Session um 22:40 nur ein Replay geschrieben. Die Ergebnisse sind
+       von der Live-Zeitentafel abgelesen, deren Spalte "Intervall" heißt:
+       Abstand zum Vordermann, nicht zum Sieger. Die Werte stehen deshalb
+       unverändert so da, und die Überschrift sagt es dazu.
+       Verstappen zeigte auf P3 -23,238 — negativ und damit unmöglich, wie
+       schon in Silverstone. Bei ihm steht ein Strich statt einer Zahl.    */
+    sprint: {
+      laps: 12,
+      note: "Abstände zum Vordermann",
+      results: [
+        { driver: "emefka",      gap: "—" },
+        { driver: "mauramir",    gap: "+0.853" },
+        { driver: "verstappen",  gap: "—" },
+        { driver: "gasly",       gap: "+7.048" },
+        { driver: "piastri",     gap: "+3.301" },
+        { driver: "alonso",      gap: "+1.096" },
+        { driver: "hamilton",    gap: "+0.970" },
+        { driver: "ocon",        gap: "+2.000" },
+        { driver: "lawson",      gap: "+0.402" },
+        { driver: "sainz",       gap: "+2.496" },
+        { driver: "bottas",      gap: "+2.421" },
+        { driver: "russell",     gap: "+2.177" },
+        { driver: "norris",      gap: "+0.551" },
+        { driver: "huelkenberg", gap: "+1.478" },
+        { driver: "albon",       gap: "+0.882" },
+        { driver: "perez",       gap: "+1.035" },
+        { driver: "antonelli",   gap: "+1.490" },
+        { driver: "lindblad",    gap: "+1.256" },
+        { driver: "bearman",     gap: "+2.462" },
+        { driver: "hadjar",      gap: "+4.070" },
+        { driver: "stroll",      gap: "+8.820" },
+        { driver: "colapinto",   gap: "+0.818" },
+      ]
+    },
     penalties: [
       { t: "5:03.096",  lap: 4,  driver: "colapinto", what: "Mechanisches Versagen",  pen: "DNF" },
       { t: "12:51.174", lap: 10, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
@@ -716,7 +746,7 @@ function renderRace(idx){
 
   const spr = SPR_BY_RACE[idx];
   const sprintBlock = spr ? `
-    <h3 class="pentitle">Sprint${r.sprint.laps ? " · " + r.sprint.laps + " Runden" : ""}</h3>
+    <h3 class="pentitle">Sprint${r.sprint.laps ? " · " + r.sprint.laps + " Runden" : ""}${r.sprint.note ? " · " + r.sprint.note : ""}</h3>
     <div class="tower">${towerRows(r.sprint.results, spr, r.sprint.fastestLap)}</div>` : "";
 
   $("#race").innerHTML = `
