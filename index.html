@@ -304,7 +304,10 @@ const RACES = [
       { t: "5:03.096",  lap: 4,  driver: "colapinto", what: "Mechanisches Versagen",  pen: "DNF" },
       { t: "12:51.174", lap: 10, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
       { t: "23:38.726", lap: 18, driver: "piastri",   what: "Mechanisches Versagen",  pen: "DNF" },
-      { t: "32:21.597", lap: 25, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe" },
+      { t: "32:21.597", lap: 25, driver: "emefka",    what: "Rasen in der Boxengasse", pen: "10 Sek. Zeitstrafe",
+        note: "von mauramir in die Box gecheckt" },
+      { t: "32:21.597", lap: 25, driver: "mauramir",  what: "emefka in der Boxengasse abgeräumt", pen: "10 Sek. Zeitstrafe",
+        steward: true, note: "nachträglich von der Rennleitung verhängt" },
       { t: "33:52.221", lap: 26, driver: "emefka",    what: "Kurve abgekürzt",         pen: "3 Sek." },
       { t: "46:48.591", lap: 36, driver: "emefka",    what: "Nicht erfüllte Strafe",   pen: "10 Sek." },
     ],
@@ -526,6 +529,15 @@ table.pens .pd.human{color:var(--human)}
 table.pens .pw{text-align:left;font-family:var(--sans);color:var(--muted)}
 table.pens .pp{text-align:right;font-weight:700;color:#ff5a4d;white-space:nowrap}
 table.pens .pp.out{color:#5f5f6a}
+/* Zusatz zum Vorfall und Kennzeichnung für Entscheidungen der Rennleitung,
+   die nicht aus der Spiel-CSV stammen */
+table.pens .pnote{font-style:italic;font-weight:400;color:#61616c}
+table.pens .pnote::before{content:"— ";font-style:normal}
+table.pens .pliga{
+  display:inline-block;margin-left:8px;padding:2px 6px;border-radius:2px;
+  background:var(--darkred);color:#fff;font-family:var(--sans);font-size:9px;
+  font-weight:700;letter-spacing:.14em;text-transform:uppercase;vertical-align:1px
+}
 
 @media (max-width:620px){
   .row{grid-template-columns:38px 4px 1fr auto;gap:10px;padding-right:12px}
@@ -739,8 +751,8 @@ function renderRace(idx){
       <td class="pt">${p.t}</td>
       <td class="pl">R${p.lap}</td>
       <td class="pd ${d.human ? "human" : ""}">${d.name}</td>
-      <td class="pw">${p.what}</td>
-      <td class="pp ${/DNF/.test(p.pen) ? "out" : ""}">${p.pen}</td>
+      <td class="pw">${p.what}${p.note ? ' <span class="pnote">' + p.note + "</span>" : ""}</td>
+      <td class="pp ${/DNF/.test(p.pen) ? "out" : ""}">${p.pen}${p.steward ? ' <span class="pliga">Liga</span>' : ""}</td>
     </tr>`;
   }).join("");
 
