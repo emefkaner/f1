@@ -79,6 +79,23 @@ const DRIVERS = [
   { id: "bortoleto",   name: "Gabriel Bortoleto",     tag: "BOR", team: "Audi",         color: "#00B3A4" },
 ];
 
+/* Farben für die Konstrukteurswertung. Enthält auch Teams, die im aktuellen
+   Kader nicht mehr auftauchen, aber in früheren Runden Punkte geholt haben. */
+const TEAM_COLORS = {
+  "Red Bull":     "#3671C6",
+  "Mercedes":     "#27F4D2",
+  "Ferrari":      "#E8002D",
+  "McLaren":      "#FF8000",
+  "Aston Martin": "#229971",
+  "Williams":     "#64C4FF",
+  "Alpine":       "#FF87BC",
+  "Haas":         "#B6BABD",
+  "Audi":         "#00B3A4",
+  "Cadillac":     "#C9A227",
+  "Racing Bulls": "#6692FF",
+  "Kick Sauber":  "#52E252",
+};
+
 /* Ergebnisse 1:1 aus den Spiel-CSVs, volle Zielreihenfolge inklusive KI.
    Die Punkte, die die Seite daraus rechnet, decken sich mit der Pkt.-Spalte
    des Spiels.
@@ -105,11 +122,14 @@ const RACES = [
       { t: "31:06.839", lap: 24, driver: "huelkenberg", what: "Mechanisches Versagen",  pen: "DNF" },
       { t: "32:37.975", lap: 24, driver: "l1chtfloh",   what: "Nicht erfüllte Strafe",  pen: "10 Sek." },
     ],
+    /* Runde 1 lief noch mit dem 2025er Kader. Wo das Team von heute abweicht,
+       steht es hier dabei — nur dafür wird team pro Zeile gebraucht, für die
+       Konstrukteurswertung.                                                */
     results: [
-      { driver: "emefka",      gap: "32:34.071" },
+      { driver: "emefka",      gap: "32:34.071", team: "Red Bull" },
       { driver: "russell",     gap: "+22.268" },
       { driver: "hamilton",    gap: "+23.479" },
-      { driver: "bortoleto",   gap: "+25.412" },
+      { driver: "bortoleto",   gap: "+25.412", team: "Kick Sauber" },
       { driver: "norris",      gap: "+28.875" },
       { driver: "colapinto",   gap: "+29.318" },
       { driver: "sainz",       gap: "+31.123" },
@@ -122,10 +142,10 @@ const RACES = [
       { driver: "albon",       gap: "+52.006" },
       { driver: "bearman",     gap: "+57.338" },
       { driver: "gasly",       gap: "+1:08.702" },
-      { driver: "hadjar",      gap: "+1 Runde" },
-      { driver: "l1chtfloh",   gap: "+1 Runde" },
+      { driver: "hadjar",      gap: "+1 Runde",  team: "Racing Bulls" },
+      { driver: "l1chtfloh",   gap: "+1 Runde",  team: "Aston Martin" },
       { driver: "mauramir",    gap: "+1 Runde" },
-      { driver: "huelkenberg", gap: "+2 Runden" },
+      { driver: "huelkenberg", gap: "+2 Runden", team: "Kick Sauber" },
     ]
   },
   {
@@ -170,7 +190,7 @@ const RACES = [
       { t: "26:16.497", lap: 14, driver: "verstappen", what: "Mechanisches Versagen", pen: "DNF" },
     ],
     results: [
-      { driver: "l1chtfloh",   gap: "42:28.550" },
+      { driver: "l1chtfloh",   gap: "42:28.550", team: "Cadillac" },
       { driver: "norris",      gap: "+0.647" },
       { driver: "alonso",      gap: "+3.947" },
       { driver: "emefka",      gap: "+7.013" },
@@ -529,6 +549,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--line)}
 .who{min-width:0}
 .who .nm{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .who .tm{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.who .mine{color:var(--human)}
 .who .tag{font-family:var(--mono);font-weight:400;letter-spacing:.02em;text-transform:none;color:#61616c}
 .who .tag::before{content:"·";margin:0 6px}
 .gap{font-family:var(--mono);font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
@@ -640,6 +661,11 @@ table.pens .pliga{
   </section>
 
   <section>
+    <h2>Konstrukteurswertung</h2>
+    <div class="tower" id="teams"></div>
+  </section>
+
+  <section>
     <h2>Saisonübersicht</h2>
     <div class="scroller"><table id="matrix"></table></div>
   </section>
@@ -728,6 +754,54 @@ function renderNav(){
          + `>${esc(l.label)}`
          + (extern ? '<span class="ext" aria-hidden="true">↗</span>' : "")
          + `</a>`;
+  }).join("");
+}
+
+/* Konstrukteurswertung. Das Team kommt pro Ergebniszeile aus team, sonst aus
+   dem aktuellen Team des Fahrers — so landen Punkte bei dem Rennstall, für
+   den sie tatsächlich gefahren wurden. Sprintpunkte zählen mit. */
+function constructors(){
+  const t = {};
+  const buche = (team, id, punkte) => {
+    if (!team) return;
+    (t[team] ||= { team, points: 0, fahrer: new Set() });
+    t[team].points += punkte;
+    t[team].fahrer.add(id);
+  };
+  RACES.forEach((race, i) => {
+    const sessions = [[race.results, PTS_BY_RACE[i]]];
+    if (race.sprint) sessions.push([race.sprint.results, SPR_BY_RACE[i]]);
+    sessions.forEach(([results, pts]) => {
+      results.forEach(r => {
+        const e = pts[r.driver];
+        buche(r.team || D[r.driver]?.team, r.driver, e ? e.points : 0);
+      });
+    });
+  });
+  return Object.values(t).sort((a, b) => b.points - a.points || a.team.localeCompare(b.team));
+}
+
+function renderConstructors(){
+  const c = constructors();
+  const lead = c[0]?.points ?? 0;
+  $("#teams").innerHTML = c.map((x, i) => {
+    const tags = [...x.fahrer]
+      .map(id => D[id])
+      .filter(Boolean)
+      .sort((a, b) => a.tag.localeCompare(b.tag))
+      .map(d => d.human ? `<span class="mine">${d.tag}</span>` : d.tag)
+      .join(" · ");
+    return `
+    <div class="row ${i===0?"p1":""}">
+      <div class="pos">${i+1}</div>
+      <div class="spine" style="background:${TEAM_COLORS[x.team] || "#555"}"></div>
+      <div class="who">
+        <div class="nm">${x.team}</div>
+        <div class="tm">${tags}</div>
+      </div>
+      <div class="gap">${i===0 ? x.fahrer.size + " Fahrer" : "−" + (lead - x.points)}</div>
+      <div class="pts">${x.points}<small>PKT</small></div>
+    </div>`;
   }).join("");
 }
 
@@ -858,6 +932,7 @@ function renderRounds(){
 renderNav();
 renderHead();
 renderTower();
+renderConstructors();
 renderMatrix();
 renderRounds();
 renderRace(RACES.length - 1);
