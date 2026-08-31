@@ -343,6 +343,71 @@ const RACES = [
       { driver: "colapinto",   dnf: true, gap: "Mechanisches Versagen, Runde 4" },
     ]
   },
+  {
+    round: 7, gp: "Monza", circuit: "Autodromo Nazionale Monza", date: "2026-08-31", laps: 27,
+    fastestLap: "emefka",
+    /* Erstes Sprintwochenende mit eigener CSV für den Sprint — die Abstände
+       sind hier echte Rückstände auf den Sieger, nicht wie in Zandvoort von
+       der Zeitentafel abgelesene Intervalle. Das Spiel hat im Sprint selbst
+       8-7-6-5-4-3-2-1 vergeben, deckt sich also mit SPRINT_POINTS.        */
+    sprint: {
+      laps: 9,
+      fastestLap: "emefka",
+      results: [
+        { driver: "emefka",      gap: "12:55.101" },
+        { driver: "russell",     gap: "+2.335" },
+        { driver: "sainz",       gap: "+4.570" },
+        { driver: "norris",      gap: "+8.539" },
+        { driver: "mauramir",    gap: "+9.222" },
+        { driver: "ocon",        gap: "+9.540" },
+        { driver: "albon",       gap: "+10.029" },
+        { driver: "bottas",      gap: "+12.175" },
+        { driver: "piastri",     gap: "+13.710" },
+        { driver: "antonelli",   gap: "+16.450" },
+        { driver: "lindblad",    gap: "+16.612" },
+        { driver: "perez",       gap: "+18.032" },
+        { driver: "verstappen",  gap: "+18.863" },
+        { driver: "gasly",       gap: "+19.341" },
+        { driver: "bearman",     gap: "+20.343" },
+        { driver: "colapinto",   gap: "+20.757" },
+        { driver: "hadjar",      gap: "+21.859" },
+        { driver: "alonso",      gap: "+22.030" },
+        { driver: "lawson",      gap: "+24.411" },
+        { driver: "hamilton",    gap: "+24.605" },
+        { driver: "stroll",      gap: "+24.904" },
+        { driver: "l1chtfloh",   gap: "+30.430" },
+      ]
+    },
+    penalties: [
+      { t: "23:53.754", lap: 17, driver: "emefka", what: "Kurve abgekürzt",        pen: "10 Sek. Zeitstrafe" },
+      { t: "33:13.755", lap: 23, driver: "perez",  what: "Mechanisches Versagen",  pen: "DNF" },
+      { t: "39:20.573", lap: 27, driver: "emefka", what: "Nicht erfüllte Strafe",  pen: "10 Sek." },
+    ],
+    results: [
+      { driver: "emefka",      gap: "39:30.562" },
+      { driver: "l1chtfloh",   gap: "+23.536" },
+      { driver: "mauramir",    gap: "+26.562" },
+      { driver: "sainz",       gap: "+29.080" },
+      { driver: "bearman",     gap: "+30.297" },
+      { driver: "antonelli",   gap: "+30.726" },
+      { driver: "alonso",      gap: "+32.509" },
+      { driver: "norris",      gap: "+34.511" },
+      { driver: "gasly",       gap: "+35.812" },
+      { driver: "verstappen",  gap: "+35.984" },
+      { driver: "lawson",      gap: "+41.520" },
+      { driver: "hamilton",    gap: "+41.574" },
+      { driver: "bottas",      gap: "+41.973" },
+      { driver: "russell",     gap: "+42.588" },
+      { driver: "ocon",        gap: "+43.469" },
+      { driver: "piastri",     gap: "+45.150" },
+      { driver: "albon",       gap: "+45.650" },
+      { driver: "lindblad",    gap: "+46.085" },
+      { driver: "colapinto",   gap: "+48.826" },
+      { driver: "hadjar",      gap: "+50.134" },
+      { driver: "stroll",      gap: "+54.356" },
+      { driver: "perez",       dnf: true, gap: "Mechanisches Versagen, Runde 23" },
+    ]
+  },
 ];
 
 /* Navigation ganz oben. Neue Einträge einfach anhängen — Reihenfolge hier
